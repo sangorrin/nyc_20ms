@@ -1,0 +1,31 @@
+# Fly.io app configuration
+app = "nyc-outliers-detector"
+primary_region = "iad"  # Choose region close to Tigris (e.g., us-east for Ashburn)
+
+[build]
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 1000
+    soft_limit = 500
+
+[[vm]]
+  # High-performance VM to avoid CPU bottleneck
+  cpu_kind = "performance"
+  cpus = 4
+  memory_mb = 8192
+
+[env]
+  PORT = "8080"
+  PYTHONUNBUFFERED = "1"
+
+# Tigris storage created separately with: fly storage create
+# Then link via secrets: fly secrets set AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=xxx
