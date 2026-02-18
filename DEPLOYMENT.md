@@ -38,10 +38,8 @@ cd nyc_20ms
 fly launch --no-deploy
 
 # Choose:
-# - App name: nyc-outliers-detector (or your preferred name)
+# - App name: nyc-outliers-detector
 # - Region: iad (US East - Ashburn) for best Tigris latency
-# - PostgreSQL: No
-# - Redis: No
 ```
 
 #### 4. Create Tigris Storage Bucket
@@ -54,21 +52,19 @@ fly storage create
 # - Name: nyc-parquets
 # - Region: Choose same as your app (e.g., iad for US East)
 
-# Save the credentials shown:
-# - Access Key ID (starts with tid_)
-# - Secret Access Key (starts with tsec_)
-# - Endpoint URL (https://fly.storage.tigris.dev)
+# Save the credentials shown in .env
+cp .env.example .env
+AWS_ACCESS_KEY_ID=tid_xxxxxxxxx
+AWS_SECRET_ACCESS_KEY=tsec_xxxxxxxxxxx
+TIGRIS_BUCKET=nyc-parquets
+TIGRIS_ENDPOINT_URL=https://fly.storage.tigris.dev
 ```
 
 #### 5. Set Environment Secrets
 
 ```bash
 # Set Tigris credentials
-fly secrets set \
-  AWS_ACCESS_KEY_ID="tid_your_access_key_here" \
-  AWS_SECRET_ACCESS_KEY="tsec_your_secret_key_here" \
-  TIGRIS_BUCKET="nyc-parquets" \
-  TIGRIS_ENDPOINT_URL="https://fly.storage.tigris.dev"
+fly secrets import < .env
 
 # Verify secrets are set
 fly secrets list
