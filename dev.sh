@@ -26,13 +26,13 @@ docker build -t nyc-outliers:dev .
 echo "🐳 Starting Docker container..."
 echo ""
 echo "🎉 Application will be available at:"
-echo "   http://localhost:8080"
-echo "   API Docs: http://localhost:8080/docs"
+echo "   http://localhost:8000"
+echo "   API Docs: http://localhost:8000/docs"
 echo ""
 
 docker run --rm -it \
   --name nyc-outliers-dev \
-  -p 8080:8080 \
+  -p 8000:8000 \
   --env-file .env \
   nyc-outliers:dev
 

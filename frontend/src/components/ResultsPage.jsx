@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 
-// Use relative URLs so it works both locally and in production
-const API_URL = ''
-
 function ResultsPage({ metadata, onBack }) {
   const [isDetecting, setIsDetecting] = useState(false)
   const [results, setResults] = useState(null)
@@ -14,7 +11,7 @@ function ResultsPage({ metadata, onBack }) {
     setError(null)
 
     try {
-      const response = await axios.get(`${API_URL}/api/detect_outliers`, {
+      const response = await axios.get('/api/detect_outliers', {
         params: { filename: metadata.filename }
       })
 

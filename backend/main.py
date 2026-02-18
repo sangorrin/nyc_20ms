@@ -20,7 +20,7 @@ import pyarrow.parquet as pq
 from botocore.config import Config
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pathlib import Path
@@ -364,9 +364,6 @@ async def detect_outliers(filename: str):
         raise HTTPException(status_code=500, detail=f"Error detecting outliers: {str(e)}")
 
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 # ============================================================================
 # STATIC FILES (Must be LAST after all API routes)
 # ============================================================================
@@ -374,6 +371,24 @@ if __name__ == "__main__":
 # Serve static frontend files (for production)
 frontend_path = Path(__file__).parent.parent / "frontend" / "dist"
 if frontend_path.exists():
-    app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="static")
+    # Mount assets directory separately
+    app.mount("/assets", StaticFiles(directory=str(frontend_path / "assets")), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """Serve frontend for all non-API routes"""
+        # If it's an API or health route, this won't match (already defined above)
+        # Try to serve the requested file
+        file_path = frontend_path / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+
+        # Otherwise serve index.html (SPA fallback)
+        return FileResponse(frontend_path / "index.html")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 

@@ -1,9 +1,6 @@
 import React, { useState, useRef } from 'react'
 import axios from 'axios'
 
-// Use relative URLs so it works both locally and in production
-const API_URL = ''
-
 function UploadPage({ onUploadSuccess }) {
   const [file, setFile] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -62,7 +59,7 @@ function UploadPage({ onUploadSuccess }) {
       const formData = new FormData()
       formData.append('file', file)
 
-      const response = await axios.post(`${API_URL}/api/upload_parquet`, formData, {
+      const response = await axios.post('/api/upload_parquet', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
