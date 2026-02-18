@@ -72,6 +72,19 @@ function UploadPage({ onUploadSuccess }) {
     }
   }
 
+  const handleUseSampleFile = () => {
+    // Use pre-existing sample file from Tigris with hardcoded stats
+    const sampleData = {
+      file_id: 'yellow_tripdata_2020-09.parquet',
+      filename: 'yellow_tripdata_2020-09.parquet',
+      rows: 1341017,
+      size_mb: 30.86,
+      partitions: 10,
+      upload_time_ms: 0
+    }
+    onUploadSuccess(sampleData)
+  }
+
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -140,6 +153,36 @@ function UploadPage({ onUploadSuccess }) {
               className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-purple-brand bg-purple-100 hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-brand transition-colors"
             >
               Select File
+            </button>
+          </div>
+
+          {/* Sample File Option */}
+          <div className="mt-6 text-center">
+            <div className="flex items-center justify-center mb-4">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="px-4 text-gray-500 font-medium">OR</span>
+              <div className="flex-grow border-t border-gray-300"></div>
+            </div>
+            <button
+              onClick={handleUseSampleFile}
+              disabled={isUploading}
+              className="inline-flex items-center px-6 py-3 border-2 border-yellow-400 bg-yellow-50 hover:bg-yellow-100 text-gray-900 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+            >
+              <svg
+                className="w-5 h-5 mr-2 text-yellow-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              <span className="font-medium">Use yellow_tripdata_2020-09.parquet</span>
+              <span className="ml-2 text-sm text-gray-600">30.86 MB</span>
             </button>
           </div>
 
