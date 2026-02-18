@@ -75,12 +75,13 @@ function UploadPage({ onUploadSuccess }) {
   const handleUseSampleFile = () => {
     // Use pre-existing sample file from Tigris with hardcoded stats
     const sampleData = {
-      file_id: 'yellow_tripdata_2020-09.parquet',
       filename: 'yellow_tripdata_2020-09.parquet',
-      rows: 1341017,
-      size_mb: 30.86,
-      partitions: 10,
-      upload_time_ms: 0
+      total_rows: 1341017,
+      total_size_bytes: 32346931, // 30.86 MB in bytes
+      num_partitions: 10,
+      columns: ['VendorID', 'tpep_pickup_datetime', 'tpep_dropoff_datetime', 'passenger_count', 'trip_distance', 'fare_amount', 'extra', 'mta_tax', 'tip_amount', 'tolls_amount', 'improvement_surcharge', 'total_amount'],
+      upload_time_ms: 0,
+      already_exists: true
     }
     onUploadSuccess(sampleData)
   }
