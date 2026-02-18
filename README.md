@@ -38,7 +38,21 @@ Process a 30MB optimized parquet file stored on an HTTP server in 20ms total:
 - Files stored as: `nyc_parquets/{filename}/part{0-9}.parquet`
 - Co-located with compute for low latency
 
-## 🚀 Quick Start
+## � Screenshots
+
+### Landing Page
+![Landing Page](screenshots/1-landing.jpeg)
+*Drag & drop interface for parquet file upload*
+
+### File Uploaded
+![File Uploaded](screenshots/2-uploaded.jpeg)
+*File metadata and detection button ready*
+
+### Results
+![Results](screenshots/3-processed.jpeg)
+*Outliers detected with performance metrics*
+
+## �🚀 Quick Start
 
 See [QUICKSTART.md](QUICKSTART.md) for setup instructions.
 
