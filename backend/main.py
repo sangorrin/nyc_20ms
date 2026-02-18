@@ -255,6 +255,12 @@ def detect_outliers_in_partition(table: pa.Table) -> pa.Table:
 # API ENDPOINTS
 # ============================================================================
 
+@app.get("/health")
+async def health():
+    """Health check endpoint for monitoring"""
+    return {"status": "ok", "service": "NYC Yellow Taxi Outliers Detector"}
+
+
 @app.post("/api/upload_parquet", response_model=FileMetadata)
 async def upload_parquet(file: UploadFile = File(...)):
     """

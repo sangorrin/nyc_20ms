@@ -75,6 +75,7 @@ fly secrets list
 ```bash
 # First deployment
 fly deploy
+fly scale count 1
 
 # Monitor deployment
 fly logs

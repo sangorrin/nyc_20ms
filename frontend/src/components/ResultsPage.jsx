@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8080'
+// Use relative URLs so it works both locally and in production
+const API_URL = ''
 
 function ResultsPage({ metadata, onBack }) {
   const [isDetecting, setIsDetecting] = useState(false)
