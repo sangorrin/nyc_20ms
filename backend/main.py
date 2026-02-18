@@ -11,7 +11,7 @@ Optimized for <20ms outlier detection:
 import io
 import time
 from contextlib import asynccontextmanager
-from typing import List, Optional
+from typing import List
 
 import boto3
 import pyarrow as pa
@@ -50,6 +50,7 @@ class FileMetadata(BaseModel):
     num_partitions: int
     columns: List[str]
     upload_time_ms: float
+    already_exists: bool = False
 
 
 class OutlierResult(BaseModel):
@@ -145,11 +146,37 @@ def resolve_column_names(schema: pa.Schema) -> dict:
     return col_map
 
 
-def upload_partitions_to_s3(filename: str, table: pa.Table, num_partitions: int = 10):
+def file_exists_in_s3(key: str) -> bool:
+    """Check if a file exists in S3 without downloading it"""
+    try:
+        s3_client.head_object(Bucket=TIGRIS_BUCKET, Key=key)
+        return True
+    except s3_client.exceptions.NoSuchKey:
+        return False
+    except Exception:
+        # On any other error, assume file doesn't exist to allow upload
+        return False
+
+
+def upload_partitions_to_s3(filename: str, table: pa.Table, num_partitions: int = 10, skip_if_exists: bool = True) -> bool:
     """
     Partition table by row groups and upload to S3.
     Assumes table is already sorted by distance DESC.
+
+    Args:
+        filename: Name of the parquet file
+        table: PyArrow table to partition and upload
+        num_partitions: Number of partitions to create
+        skip_if_exists: If True, skip upload if first partition already exists
+
+    Returns:
+        True if files were uploaded, False if skipped (already exist)
     """
+    # Check if file already exists (use part0 as marker)
+    first_partition_key = f"nyc_parquets/{filename}/part0.parquet"
+    if skip_if_exists and file_exists_in_s3(first_partition_key):
+        return False  # Files already exist, skip upload
+
     rows_per_partition = len(table) // num_partitions
 
     for i in range(num_partitions):
@@ -165,6 +192,8 @@ def upload_partitions_to_s3(filename: str, table: pa.Table, num_partitions: int 
         # Upload to S3
         key = f"nyc_parquets/{filename}/part{i}.parquet"
         s3_client.upload_fileobj(buffer, TIGRIS_BUCKET, key)
+
+    return True  # Files were uploaded
 
 
 def download_first_partition(filename: str) -> pa.Table:
@@ -286,9 +315,13 @@ async def upload_parquet(file: UploadFile = File(...)):
         filename = file.filename
         num_partitions = 10
 
-        # Upload partitions to S3 (always override if exists)
-        upload_partitions_to_s3(filename, table, num_partitions)
-        print(f"✓ Uploaded {num_partitions} partitions for {filename}")
+        # Upload partitions to S3 (skip if already exists to preserve CDN cache)
+        was_uploaded = upload_partitions_to_s3(filename, table, num_partitions, skip_if_exists=True)
+
+        if was_uploaded:
+            print(f"✓ Uploaded {num_partitions} partitions for {filename}")
+        else:
+            print(f"⊘ Skipped upload for {filename} (already exists in Tigris)")
 
         upload_time = (time.perf_counter() - start_time) * 1000
 
@@ -298,7 +331,8 @@ async def upload_parquet(file: UploadFile = File(...)):
             total_size_bytes=len(contents),
             num_partitions=num_partitions,
             columns=table.column_names,
-            upload_time_ms=round(upload_time, 2)
+            upload_time_ms=round(upload_time, 2),
+            already_exists=not was_uploaded
         )
 
     except Exception as e:
