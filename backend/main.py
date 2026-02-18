@@ -111,11 +111,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve static frontend files (for production)
-frontend_path = Path(__file__).parent.parent / "frontend" / "dist"
-if frontend_path.exists():
-    app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="static")
-
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -260,12 +255,6 @@ def detect_outliers_in_partition(table: pa.Table) -> pa.Table:
 # API ENDPOINTS
 # ============================================================================
 
-@app.get("/")
-async def root():
-    """Health check endpoint"""
-    return {"status": "ok", "service": "NYC Yellow Taxi Outliers Detector"}
-
-
 @app.post("/api/upload_parquet", response_model=FileMetadata)
 async def upload_parquet(file: UploadFile = File(...)):
     """
@@ -372,3 +361,13 @@ async def detect_outliers(filename: str):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+# ============================================================================
+# STATIC FILES (Must be LAST after all API routes)
+# ============================================================================
+
+# Serve static frontend files (for production)
+frontend_path = Path(__file__).parent.parent / "frontend" / "dist"
+if frontend_path.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="static")
+
+
