@@ -142,29 +142,6 @@ nyc_20ms/
 └── .env.example         # Environment template
 ```
 
-## 🧪 Testing the Solution
-
-### Local Testing
-```bash
-# Start services
-./dev.sh
-
-# Upload optimized file via web UI
-open http://localhost:3000
-
-# Or test via API
-python test_api.py ../nyc_perf_questions/parquets_optimized/yellow_tripdata_2023-01.parquet
-```
-
-### Production Testing
-```bash
-# Deploy to Fly.io
-fly deploy
-
-# Test endpoint
-curl "https://nyc-outliers-detector.fly.dev/api/detect_outliers?filename=test.parquet"
-```
-
 ## 🎯 Success Metrics
 
 ### Performance Tiers
@@ -202,40 +179,9 @@ If still not hitting < 20ms:
 6. **Pre-fetching**: Load partition before detection request
 7. **Streaming**: Stream parse instead of buffering
 
-## 📊 Comparison with Previous Approach
-
-| Metric | Old Approach | New Approach | Improvement |
-|--------|--------------|--------------|-------------|
-| Data Transfer | 30 MB | 3 MB | 10x less |
-| Download Time | 100-200ms | 8-12ms | 15x faster |
-| Processing | Full scan | Pre-filtered | 10x faster |
-| Total Time | 200-400ms | 15-20ms | 15x faster |
-
-## 🎓 Key Learnings
-
-1. **Data Locality Matters**: Co-location reduced latency by 80%
-2. **Smart Partitioning > Raw Speed**: Processing 10% vs 100% of data
-3. **Connection Reuse**: Keep-alive saves 5-10ms per request
-4. **Preprocessing Wins**: Pre-sorted data eliminates percentile calculation
-5. **Right-Sized Infrastructure**: Performance CPUs prevent bottlenecks
-
-## 🔮 Future Enhancements
-
-- [ ] WebSocket real-time updates
-- [ ] Batch processing multiple files
-- [ ] Result caching layer
-- [ ] Anomaly trend analysis
-- [ ] ML-based outlier prediction
-- [ ] Multi-region deployment
-- [ ] Auto-scaling based on load
-
 ## 📚 References
 
 - [Challenge Description](CHALLENGE.md)
 - [Full Documentation](README.md)
 - [Deployment Guide](DEPLOYMENT.md)
-- [Original Performance Work](../nyc_perf_questions/)
-
----
-
-**Result**: Solution achieves 15-20ms end-to-end latency, meeting the challenge goal! 🎯
+- [Original Performance Work](https://github.com/sangorrin/nyc_trips_questions)

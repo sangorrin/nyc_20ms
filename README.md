@@ -81,14 +81,6 @@ See [QUICKSTART.md](QUICKSTART.md) for setup instructions.
 4. **CPU Processing**: Filtering and computing outliers
    - Solution: High-performance VM + PyArrow vectorization
 
-## 📈 API Reference
-
-See [API.md](API.md) for complete API documentation.
-
-## 🧪 Testing
-
-See [TESTING.md](TESTING.md) for testing guide.
-
 ## 🎨 Frontend Features
 
 - Drag & drop file upload with visual feedback
@@ -109,9 +101,9 @@ nyc_20ms/
 │   └── requirements.txt     # Python dependencies
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx         # Main app component
-│   │   ├── main.jsx        # Entry point
-│   │   ├── index.css       # Global styles
+│   │   ├── App.jsx          # Main app component
+│   │   ├── main.jsx         # Entry point
+│   │   ├── index.css        # Global styles
 │   │   └── components/
 │   │       ├── UploadPage.jsx    # File upload UI
 │   │       └── ResultsPage.jsx   # Results display
@@ -120,10 +112,19 @@ nyc_20ms/
 │   ├── vite.config.js
 │   ├── tailwind.config.js
 │   └── postcss.config.js
-├── Dockerfile              # Multi-stage build
-├── fly.toml               # Fly.io configuration
-├── .env.example           # Environment template
-└── README.md             # This file
+├── screenshots/             # UI screenshots
+├── Dockerfile               # Multi-stage build
+├── fly.toml                 # Fly.io configuration
+├── dev.sh                   # Local development script
+├── test_api.py              # API testing script
+├── .env.example             # Environment template
+├── .dockerignore            # Docker ignore rules
+├── README.md                # This file
+├── QUICKSTART.md            # Setup guide
+├── SOLUTION.md              # Technical approach
+├── API.md                   # API documentation
+├── DEPLOYMENT.md            # Deployment guide
+└── TESTING.md               # Testing guide
 ```
 
 ## 🔒 Security Notes
@@ -142,8 +143,12 @@ nyc_20ms/
 4. **Batch Processing**: Process multiple files in parallel if needed
 5. **Caching**: Consider caching first partition results
 
-## 📚 Resources
+## 📚 References
 
+- Read [SOLUTION.md](SOLUTION.md) for technical approach
+- Check [API.md](API.md) for API documentation
+- Check [DEPLOYMENT.md](DEPLOYMENT.md) for production deployment instructions.
+- Run [TESTING.md](TESTING.md) for comprehensive testing
 - [NYC TLC Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
 - [PyArrow Documentation](https://arrow.apache.org/docs/python/)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
@@ -152,8 +157,4 @@ nyc_20ms/
 
 ## 📄 License
 
-See parent project license.
-
-## 🙏 Acknowledgments
-
-Built upon the NYC taxi performance optimization work in `nyc_perf_questions`.
+MIT: see parent project license.

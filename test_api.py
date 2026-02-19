@@ -2,26 +2,25 @@
 Test script for local development and API validation
 """
 import requests
+import argparse
 from pathlib import Path
 
-API_BASE = "http://localhost:8080"
-
-def test_health():
+def test_health(api_base):
     """Test health endpoint"""
     print("Testing health endpoint...")
-    response = requests.get(f"{API_BASE}/")
+    response = requests.get(f"{api_base}/")
     print(f"Status: {response.status_code}")
     print(f"Response: {response.json()}")
     assert response.status_code == 200
     print("✅ Health check passed\n")
 
-def test_upload(file_path: str):
+def test_upload(file_path: str, api_base):
     """Test file upload"""
     print(f"Testing upload with {file_path}...")
 
     with open(file_path, 'rb') as f:
         files = {'file': (Path(file_path).name, f, 'application/octet-stream')}
-        response = requests.post(f"{API_BASE}/api/upload_parquet", files=files)
+        response = requests.post(f"{api_base}/api/upload_parquet", files=files)
 
     print(f"Status: {response.status_code}")
     if response.status_code == 200:
@@ -37,11 +36,11 @@ def test_upload(file_path: str):
         print(f"❌ Upload failed: {response.text}\n")
         return None
 
-def test_detection(filename: str):
+def test_detection(filename: str, api_base):
     """Test outlier detection"""
     print(f"Testing detection for {filename}...")
 
-    response = requests.get(f"{API_BASE}/api/detect_outliers", params={'filename': filename})
+    response = requests.get(f"{api_base}/api/detect_outliers", params={'filename': filename})
 
     print(f"Status: {response.status_code}")
     if response.status_code == 200:
@@ -65,30 +64,41 @@ def test_detection(filename: str):
         print(f"❌ Detection failed: {response.text}\n")
 
 if __name__ == "__main__":
-    import sys
+    parser = argparse.ArgumentParser(
+        description='Test script for NYC Outliers Detector API',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''Examples:
+  # Test locally
+  python test_api.py parquets_optimized/yellow_tripdata_2023-01.parquet
 
-    if len(sys.argv) < 2:
-        print("Usage: python test_api.py <path_to_parquet_file>")
-        print("\nExample:")
-        print("  python test_api.py parquets_optimized/yellow_tripdata_2023-01.parquet")
-        sys.exit(1)
+  # Test on production
+  python test_api.py --api-base https://your-app.fly.dev parquets_optimized/yellow_tripdata_2023-01.parquet
+'''
+    )
+    parser.add_argument('file_path', help='Path to the parquet file to test')
+    parser.add_argument(
+        '--api-base',
+        default='http://localhost:8080',
+        help='Base URL of the API (default: http://localhost:8080)'
+    )
 
-    file_path = sys.argv[1]
+    args = parser.parse_args()
 
-    if not Path(file_path).exists():
-        print(f"❌ File not found: {file_path}")
-        sys.exit(1)
+    if not Path(args.file_path).exists():
+        print(f"❌ File not found: {args.file_path}")
+        parser.exit(1)
 
     print("=" * 60)
     print("NYC Outliers Detector - API Tests")
+    print(f"API Base: {args.api_base}")
     print("=" * 60 + "\n")
 
     # Run tests
-    test_health()
-    filename = test_upload(file_path)
+    test_health(args.api_base)
+    filename = test_upload(args.file_path, args.api_base)
 
     if filename:
-        test_detection(filename)
+        test_detection(filename, args.api_base)
 
     print("=" * 60)
     print("All tests completed!")

@@ -1,229 +1,71 @@
-# Quick Start Guide
+# Quick Start Guide - Local Development
 
-Get the NYC Yellow Taxi Outliers Detector running in minutes.
+Get the NYC Yellow Taxi Outliers Detector running locally in minutes.
 
 ## Prerequisites
 
-- Docker
-- Fly.io CLI (for deployment)
-- Tigris account (S3-compatible storage)
+**Required:**
+- Docker (recommended)
+- parquets_optimized/ (https://github.com/sangorrin/nyc_trips_questions.git)
+- TIGRIS storage (follow DEPLOYMENT.md until )
 
-*Optional (only if running without Docker):*
+**Optional (only if running without Docker):**
 - Python 3.14+
 - Node.js 20+
+- Tigris S3 credentials (or local S3-compatible storage)
 
-## 🔬 File Requirements
+## 🚀 Local Development
 
-Prepare **optimized parquet files** generated using the optimization script:
-
-```bash
-cd ../nyc_perf_questions
-python scripts/optimize_parquets.py --samples 20
-```
-
-Optimized files have:
-- Standardized column names
-- Distance sorted descending
-- Exactly 10 row groups (each ~10% of data)
-- Fixed datetime types
-
-## Local Development
-
-### 1. Clone and Setup
+### Option 1: Run with Docker (Recommended)
 
 ```bash
-cd /Users/dsl/Desktop/NYC_TAXI/nyc_20ms
+# Create environment file (if using S3 storage)
 cp .env.example .env
-# Edit .env with your Tigris credentials
-```
+# Edit .env with your credentials (optional for local testing)
 
-### 2. Run with Docker
-
-```bash
 # Simple: Use the dev script
 ./dev.sh
 
 # Or manually with docker
 docker build -t nyc-outliers:dev .
 docker run --rm -it -p 8080:8080 --env-file .env nyc-outliers:dev
-
-# Application runs at http://localhost:8080
-# API Docs at http://localhost:8080/docs
 ```
 
-### 3. Alternative: Run without Docker (if needed)
+**Access the app:**
+- Web Interface: http://localhost:8080
+- API Docs: http://localhost:8080/docs
+- Health Check: http://localhost:8080/
+
+### Option 2: Run without Docker
+
+If you prefer to run services separately:
 
 ```bash
-# Backend
+# Terminal 1 - Backend
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-python main.py &  # Port 8000
+python main.py  # Starts on port 8000
 
-# Frontend
-cd ../frontend
+# Terminal 2 - Frontend
+cd frontend
 npm install
-npm run dev  # Port 3000
+npm run dev  # Starts on port 3000
+
+# Access frontend at http://localhost:3000
+open http://localhost:3000
 ```
 
-## Production Deployment on Fly.io
+## 🚢 Deploying to Production
 
-### 1. Install Fly.io CLI
+This guide covers local development only. For production deployment to Fly.io:
 
-```bash
-brew install flyctl  # macOS
-# or: curl -L https://fly.io/install.sh | sh
-```
+👉 See [DEPLOYMENT.md](DEPLOYMENT.md) for complete production deployment instructions.
 
-### 2. Login to Fly.io
+## 📚 References
 
-```bash
-fly auth login
-```
-
-### 3. Create Fly.io App
-
-```bash
-cd /Users/dsl/Desktop/NYC_TAXI/nyc_20ms
-fly launch --no-deploy
-
-# Choose:
-# - App name: nyc-outliers-detector (or your preferred name)
-# - Region: iad (US East - Ashburn) for best Tigris latency
-# - PostgreSQL: No
-# - Redis: No
-```
-
-### 4. Create Tigris S3 Bucket
-
-```bash
-fly storage create
-
-# Follow prompts:
-# - Name: nyc-parquets-optimized
-# - Region: Same as your app (e.g., iad for US East)
-
-# Save the credentials shown:
-# - Access Key ID (starts with tid_)
-# - Secret Access Key (starts with tsec_)
-# - Endpoint URL (https://fly.storage.tigris.dev)
-```
-
-### 5. Set Secrets
-
-```bash
-fly secrets set AWS_ACCESS_KEY_ID="your_tigris_key"
-fly secrets set AWS_SECRET_ACCESS_KEY="your_tigris_secret"
-fly secrets set TIGRIS_BUCKET="nyc-parquets-optimized"
-fly secrets set TIGRIS_ENDPOINT_URL="https://fly.storage.tigris.dev"
-```
-
-### 6. Deploy
-
-```bash
-fly deploy
-# App will be available at https://nyc-outliers-detector.fly.dev
-```
-
-### 7. Scale for Performance
-
-```bash
-# Ensure high-performance VM is configured (already in fly.toml)
-fly scale vm performance-4x  # 4 CPUs, 8GB RAM
-```
-
-## Testing Your Deployment
-
-### Generate Test File
-
-```bash
-cd ../nyc_perf_questions
-python scripts/optimize_parquets.py --samples 1
-```
-
-### Test Locally
-
-```bash
-cd ../nyc_20ms
-./dev.sh  # Runs on http://localhost:8080
-
-# Open in browser
-open http://localhost:8080
-
-# Or test via API
-python test_api.py ../nyc_perf_questions/parquets_optimized/yellow_tripdata_2023-01.parquet
-```
-
-### Test Production
-
-```bash
-# Open deployed app
-fly open
-
-# Or test via curl
-curl -X POST https://nyc-outliers-detector.fly.dev/api/upload_parquet \
-  -F "file=@../nyc_perf_questions/parquets_optimized/yellow_tripdata_2023-01.parquet"
-```
-
-## Troubleshooting
-
-### Docker Issues
-
-```bash
-# Check Docker is running
-docker ps
-
-# Rebuild if needed
-docker build --no-cache -t nyc-outliers:dev .
-```
-
-### Fly.io Issues
-
-```bash
-# Check logs
-fly logs
-
-# Check status
-fly status
-
-# SSH into machine
-fly ssh console
-```
-
-### Common Problems
-
-**Port already in use:**
-```bash
-# Find and kill process using port 8080
-lsof -ti:8080 | xargs kill -9
-```
-
-**Environment variables not set:**
-```bash
-# Verify .env file exists
-cat .env
-
-# For Fly.io, check secrets
-fly secrets list
-```
-
-**Tigris connection errors:**
-```bash
-# Verify credentials in secrets
-fly secrets list
-
-# Test connection
-fly ssh console
-python3 -c "import boto3; print(boto3.client('s3', endpoint_url='https://fly.storage.tigris.dev').list_buckets())"
-```
-
-## Next Steps
-
-- Read the [full README](README.md) for architecture details
-- Check [DEPLOYMENT.md](DEPLOYMENT.md) for advanced deployment options
-- Review [SOLUTION.md](SOLUTION.md) for technical approach
-
----
-
-**Need help?** Check the [Fly.io documentation](https://fly.io/docs/) or open an issue.
+- Review [README.md](README.md) for architecture details
+- Check [API.md](API.md) for API documentation
+- Read [SOLUTION.md](SOLUTION.md) for technical approach
+- Run [TESTING.md](TESTING.md) for comprehensive testing
