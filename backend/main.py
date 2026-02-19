@@ -175,8 +175,10 @@ def upload_partitions_to_s3(filename: str, table: pa.Table, num_partitions: int 
     # Check if file already exists (use part0 as marker)
     first_partition_key = f"nyc_parquets/{filename}/part0.parquet"
     if skip_if_exists and file_exists_in_s3(first_partition_key):
+        print(f"⊘ Skipping upload - {filename} already exists in S3 (checked {first_partition_key})")
         return False  # Files already exist, skip upload
 
+    print(f"→ Starting upload of {filename} - will create {num_partitions} partitions")
     rows_per_partition = len(table) // num_partitions
 
     for i in range(num_partitions):
@@ -199,6 +201,7 @@ def upload_partitions_to_s3(filename: str, table: pa.Table, num_partitions: int 
 
         s3_client.upload_fileobj(buffer, TIGRIS_BUCKET, key, ExtraArgs=extra_args if extra_args else None)
 
+    print(f"✓ Successfully uploaded {num_partitions} partitions for {filename} to S3")
     return True  # Files were uploaded
 
 
