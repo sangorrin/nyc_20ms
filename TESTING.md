@@ -294,7 +294,7 @@ cat .env | grep AWS
 ```bash
 # Check S3 connectivity
 fly ssh console
-time aws s3 ls s3://nyc-parquets --endpoint-url https://fly.storage.tigris.dev
+time aws s3 ls s3://nyc-parquets-optimized --endpoint-url https://fly.storage.tigris.dev
 ```
 
 **High processing time:**

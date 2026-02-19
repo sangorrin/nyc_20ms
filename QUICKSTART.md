@@ -101,7 +101,7 @@ fly launch --no-deploy
 fly storage create
 
 # Follow prompts:
-# - Name: nyc-parquets
+# - Name: nyc-parquets-optimized
 # - Region: Same as your app (e.g., iad for US East)
 
 # Save the credentials shown:
@@ -115,7 +115,7 @@ fly storage create
 ```bash
 fly secrets set AWS_ACCESS_KEY_ID="your_tigris_key"
 fly secrets set AWS_SECRET_ACCESS_KEY="your_tigris_secret"
-fly secrets set TIGRIS_BUCKET="nyc-parquets"
+fly secrets set TIGRIS_BUCKET="nyc-parquets-optimized"
 fly secrets set TIGRIS_ENDPOINT_URL="https://fly.storage.tigris.dev"
 ```
 

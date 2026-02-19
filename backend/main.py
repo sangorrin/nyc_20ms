@@ -9,6 +9,7 @@ Optimized for <20ms outlier detection:
 """
 
 import io
+import os
 import time
 from contextlib import asynccontextmanager
 from typing import List
@@ -31,9 +32,8 @@ from pathlib import Path
 # CONFIGURATION
 # ============================================================================
 
-TIGRIS_BUCKET = "nyc-parquets"
-TIGRIS_ENDPOINT_URL = "https://fly.storage.tigris.dev"
-MAX_PARTITION_SIZE_MB = 3  # Each partition ~3MB for 30MB file / 10 partitions
+TIGRIS_BUCKET = os.getenv("TIGRIS_BUCKET", "nyc-parquets")
+TIGRIS_ENDPOINT_URL = os.getenv("TIGRIS_ENDPOINT_URL", "https://fly.storage.tigris.dev")
 
 # S3 client with keep-alive connection pool (for uploads)
 s3_client = None
