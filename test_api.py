@@ -70,7 +70,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python test_api.py <path_to_parquet_file>")
         print("\nExample:")
-        print("  python test_api.py ../../nyc_perf_questions/parquets_optimized/yellow_tripdata_2023-01.parquet")
+        print("  python test_api.py parquets_optimized/yellow_tripdata_2023-01.parquet")
         sys.exit(1)
 
     file_path = sys.argv[1]
