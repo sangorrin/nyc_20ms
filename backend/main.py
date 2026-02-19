@@ -9,6 +9,7 @@ Optimized for <20ms outlier detection:
 """
 
 import io
+import os
 import time
 from contextlib import asynccontextmanager
 from typing import List
