@@ -191,7 +191,13 @@ def upload_partitions_to_s3(filename: str, table: pa.Table, num_partitions: int 
 
         # Upload to S3
         key = f"nyc_parquets/{filename}/part{i}.parquet"
-        s3_client.upload_fileobj(buffer, TIGRIS_BUCKET, key)
+
+        # Add x-tigris-prefetch header for partition 0 to cache it on CDN edge
+        extra_args = {}
+        if i == 0:
+            extra_args['Metadata'] = {'x-tigris-prefetch': 'true'}
+
+        s3_client.upload_fileobj(buffer, TIGRIS_BUCKET, key, ExtraArgs=extra_args if extra_args else None)
 
     return True  # Files were uploaded
 
