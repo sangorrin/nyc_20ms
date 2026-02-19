@@ -32,7 +32,7 @@ from pathlib import Path
 # CONFIGURATION
 # ============================================================================
 
-TIGRIS_BUCKET = os.getenv("TIGRIS_BUCKET", "nyc-parquets")
+TIGRIS_BUCKET = os.getenv("TIGRIS_BUCKET", "nyc-parquets-optimized")
 TIGRIS_ENDPOINT_URL = os.getenv("TIGRIS_ENDPOINT_URL", "https://fly.storage.tigris.dev")
 
 # S3 client with keep-alive connection pool (for uploads)
